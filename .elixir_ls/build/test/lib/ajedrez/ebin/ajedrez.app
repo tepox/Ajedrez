@@ -1,0 +1,10 @@
+{application,ajedrez,
+             [{applications,[kernel,stdlib,elixir,logger,bunt]},
+              {description,"ajedrez"},
+              {modules,['Elixir.Ajedrez','Elixir.Ajedrez.JugadorControl',
+                        'Elixir.Ajedrez.PiezaControl','Elixir.Jugador',
+                        'Elixir.Movimiento','Elixir.Pieza','Elixir.Tablero',
+                        'Elixir.TableroControl']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {extra_applications,[logger,bunt]}]}.
