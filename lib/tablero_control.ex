@@ -45,7 +45,7 @@ defmodule TableroControl do
 
   defp pieza_no_nil(%Movimiento{pieza: p}) do
      if p != nil do
-      {:ok , "Pieza es valida"}
+      {:ok, "Pieza es valida"}
     else
       {:error, "Pieza es nil"}
      end
@@ -53,13 +53,13 @@ defmodule TableroControl do
 
   defp pieza_pertenece_al_jugador(%Movimiento{jugador1: jugador, pieza: p}) do
     if  jugador.piezas |> Enum.any?(fn (p_j) ->
-      p_j.nombre == p.nombre and
-       p_j.p_horizontal == p.p_horizontal and
-       p_j.p_vertical == p.p_vertical end) do
-        {:ok , "Pieza si pertenece al jugador"}
-       else
-        {:error, "Pieza no pertenece al jugador"}
-      end
+          p_j.nombre == p.nombre and
+          p_j.p_horizontal == p.p_horizontal and
+          p_j.p_vertical == p.p_vertical end) do
+            {:ok , "Pieza si pertenece al jugador"}
+    else
+            {:error, "Pieza no pertenece al jugador"}
+    end
   end
 
   defp rey_no_jaque(movimiento = %Movimiento{pieza: %Pieza{nombre: :rey}}, tablero_actual) do

@@ -281,6 +281,18 @@ require Logger
     assert TableroControl.pieza_tablero(tablero, "f", 1).nombre == :torre
   end
 
+  test "movimiento enroque valido 2", %{jugadores: {jugador1, jugador2}} do
+    jugador1 = Ajedrez.JugadorControl.jugador_agrega_pieza_short(jugador1, [["t", "h", 1], ["r", "e", 1]])
+    jugador2 = Ajedrez.JugadorControl.jugador_agrega_pieza_short(jugador2, [["t", "h", 8], ["r", "e", 8]])
+    {tablero, jugador1, jugador2} = TableroControl.inicia_juego(%Tablero{}, jugador1, jugador2)
+    {:ok, _, _, tablero} =
+    tablero
+    |> TableroControl.pieza_tablero("e", 8)
+    |> Help.get_movimiento(jugador2,jugador1, "g", 8)
+    |> TableroControl.moviento(tablero)
+    assert TableroControl.pieza_tablero(tablero, "f", 8).nombre == :torre
+  end
+
   test "movimiento enroque invalido", %{jugadores: {jugador1, jugador2}} do
     jugador1 = Ajedrez.JugadorControl.jugador_agrega_pieza_short(jugador1, [["t", "h", 1], ["r", "e", 1]])
     jugador2 = Ajedrez.JugadorControl.jugador_agrega_pieza_short(jugador2, [["t", "f", 7], ["r", "e", 8]])
