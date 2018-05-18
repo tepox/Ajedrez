@@ -5,6 +5,7 @@ defmodule TableroControl do
   alias Ajedrez.JugadorControl, as: JugadorC
   alias Ajedrez.PiezaControl, as: PiezaC
 
+  require Logger
   @pos_inicial_jugador1 [
     ["t", "a",  1], ["c", "b",  1], ["a", "c",  1], ["d", "d",  1],
     ["r", "e",  1], ["a", "f",  1], ["c", "g",  1], ["t", "h",  1],
@@ -124,7 +125,7 @@ defp movimiento_valido(
     with  {:ok, _} <- PiezaC.peon_avanza(peon.p_vertical, n_v, jugador),
           {:ok, _} <- PiezaC.movimiento_pieza_valido(peon, n_h, n_v),
           {:ok, _} <- obstrucion_piezas(peon, tablero_actual, n_h, n_v),
-          {:ok, _} <- espacion_valido(tablero_actual, n_h, n_v)
+          {:ok, _} <- espacio_valido(tablero_actual, n_h, n_v)
     do
       {:ok, "moivimiento correcto"}
     else
@@ -176,9 +177,9 @@ defp movimiento_valido(
          tablero_actual
        ) do
 
-        with {:ok, _ } <- PiezaC.movimiento_pieza_valido(caballo, n_h, n_v),
-             {:ok, _ } <- espacion_valido(tablero_actual, n_h, n_v),
-             {:ok, _ } <- captura_valida(caballo, tablero_actual, n_h, n_v)
+        with {:ok, _} <- PiezaC.movimiento_pieza_valido(caballo, n_h, n_v),
+             {:ok, _} <- espacio_valido(tablero_actual, n_h, n_v),
+             {:ok, _} <- captura_o_espacio_valido(caballo, tablero_actual, n_h, n_v)
         do
           {:ok, "moivimiento correcto"}
         else
@@ -194,32 +195,14 @@ defp movimiento_valido(
          },
          tablero_actual
        ) do
-    with {:ok, _} <- PiezaC.movimiento_pieza_valido(pieza, n_h, n_v),
-         {:ok, _} <- obstrucion_piezas(pieza, tablero_actual, n_h, n_v),
-         {:ok, _} <- espacion_valido(tablero_actual, n_h, n_v),
-         {:ok, _} <- captura_valida(pieza, tablero_actual, n_h, n_v)
-    do
-      {:ok, "moivimiento correcto"}
-    else
-      error -> error
-    end
-
-    case {PiezaC.movimiento_pieza_valido(pieza, n_h, n_v),
-          obstrucion_piezas(pieza, tablero_actual, n_h, n_v),
-          espacion_valido(tablero_actual, n_h, n_v),
-          captura_valida(pieza, tablero_actual, n_h, n_v)} do
-      {a, _, _, _} when a == false ->
-        {:error, "no es posible el movimiento"}
-
-      {_, b, _, _} when b == true ->
-        {:error, "pieza obstruccion"}
-
-      {_, _, c, d} when (c or d) == false ->
-        {:error, "captura invalida, espacio invalido"}
-
-      _ ->
-        {:ok, "moivimiento correcto"}
-    end
+          with {:ok, _} <- PiezaC.movimiento_pieza_valido(pieza, n_h, n_v),
+               {:ok, _} <- obstrucion_piezas(pieza, tablero_actual, n_h, n_v),
+               {:ok, _} <- captura_o_espacio_valido(pieza, tablero_actual, n_h, n_v)
+          do
+               {:ok, "moivimiento correcto"}
+          else
+          error -> error
+          end
   end
 
   defp movimiento_valido_rey_enroque(
@@ -248,7 +231,7 @@ defp movimiento_valido(
     },
     tablero_actual) do
       with  {:ok, _} <- PiezaC.movimiento_pieza_valido(rey, n_h, n_v),
-            {:ok, _} <- captura_valida(rey, tablero_actual, n_h, n_v)
+            {:ok, _} <- captura_o_espacio_valido(rey, tablero_actual, n_h, n_v)
       do
         {:ok, "moivimiento correcto"}
       else
@@ -368,9 +351,18 @@ defp movimiento_valido(
          n_v
        ) do
     pieza_tablero = pieza_tablero(tablero, {n_h, n_v})
-    res=
+    res =
     p_h != n_h && pieza_tablero != nil && jugador.nombre != pieza_tablero.jugador.nombre
     if res, do: {:ok, "captura valida"}, else: {:error, "captura invalida"}
+  end
+
+  defp captura_valida(%Pieza{jugador: jugador}, tablero, n_h, n_v) do
+    pieza_tablero = pieza_tablero(tablero, {n_h, n_v})
+    if pieza_tablero != nil && jugador.nombre != pieza_tablero.jugador.nombre do
+      {:ok, "captura valida"}
+    else
+      {:error, "captura invalida"}
+    end
   end
 
   defp enroque_libre(tablero_actual, n_h, jugador1, jugador2) do
@@ -406,23 +398,15 @@ defp enroque_libre_evalua_posicion({h, v}, cc) do
     end
   end
 
-  defp espacion_valido(tablero, n_h, n_v) do
+  defp espacio_valido(tablero, n_h, n_v) do
     pieza = pieza_tablero(tablero, {n_h, n_v})
     if pieza == nil, do: {:ok, "espacio valido"}, else: {:error, "espacio invalido"}
   end
 
-  defp captura_valida(%Pieza{jugador: jugador}, tablero, n_h, n_v) do
-    pieza_tablero = pieza_tablero(tablero, {n_h, n_v})
-    if pieza_tablero != nil && jugador.nombre != pieza_tablero.jugador.nombre do
-      {:ok, "captura valida"}
-    else
-      {:error, "captura invalida"}
-    end
-  end
-
   defp captura_o_espacio_valido(pieza, tablero, n_h, n_v) do
-    case {espacion_valido(tablero, n_h, n_v),
-     captura_valida(pieza, tablero, n_h, n_v)} do
+    case {espacio_valido(tablero, n_h, n_v),
+          captura_valida(pieza, tablero, n_h,
+          n_v)} do
     {{:ok, _}, _} -> {:ok, "casilla correcta"}
     {_, {:ok, _}} -> {:ok, "casilla correcta"}
                 _ -> {:error, "captura invalida, espacio invalido"}
@@ -438,7 +422,7 @@ defp enroque_libre_evalua_posicion({h, v}, cc) do
 
     posiciones = posiciones(p_h, p_v, n_h, n_v)
     piezas_obstruccion = Enum.filter(posiciones, &(pieza_tablero(tablero, &1) != nil))
-    if length(piezas_obstruccion) != 0, do: {:ok, "camino libre"}, else: {:error, "pieza obstruccion"}
+    if Enum.empty?(piezas_obstruccion), do: {:ok, "camino libre"}, else: {:error, "pieza obstruccion"}
   end
 
   def pieza_tablero(tablero, p_h, p_v) when is_integer(p_v) do

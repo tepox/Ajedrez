@@ -2,6 +2,8 @@ defmodule PiezaControlTest do
   use ExUnit.Case
   doctest Ajedrez.PiezaControl
 
+  @mov_invalido {:error, "movimiento invalido"}
+
   test "movimiento valido peon" do
     pieza = %Pieza{nombre: :peon, p_horizontal: "a", p_vertical: 1}
     assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "a", 2)
@@ -19,7 +21,7 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido peon" do
     pieza = %Pieza{nombre: :peon, p_horizontal: "a", p_vertical: 1}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "a", 5)
+    assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "a", 5) == @mov_invalido
   end
 
   test "movimiento valido torre" do
@@ -34,7 +36,7 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido torre" do
     pieza = %Pieza{nombre: :torre, p_horizontal: "a", p_vertical: 1}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "c", 3)
+    assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "c", 3) == @mov_invalido
   end
 
   test "movimiento valido alfil" do
@@ -59,12 +61,12 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido alfil" do
     pieza = %Pieza{nombre: :alfil, p_horizontal: "d", p_vertical: 4}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 1)
+    assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 1) == @mov_invalido
   end
 
   test "movimiento invalido alfil 2" do
     pieza = %Pieza{nombre: :alfil, p_horizontal: "d", p_vertical: 4}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 4)
+    assert  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 4) == @mov_invalido
   end
 
   test "movimiento valido caballo" do
@@ -89,12 +91,12 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido caballo" do
     pieza = %Pieza{nombre: :caballo, p_horizontal: "d", p_vertical: 4}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 1)
+    assert  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 1) == @mov_invalido
   end
 
   test "movimiento invalido caballo 2" do
     pieza = %Pieza{nombre: :caballo, p_horizontal: "d", p_vertical: 4}
-    refute Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 3)
+    assert  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 3) == @mov_invalido
   end
 
   test "movimiento valido dama" do
@@ -129,12 +131,12 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido dama" do
     pieza = %Pieza{nombre: :dama, p_horizontal: "d", p_vertical: 4}
-    refute  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "b", 1)
+    assert  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "b", 1) == @mov_invalido
   end
 
   test "movimiento invalido dama 2" do
     pieza = %Pieza{nombre: :dama, p_horizontal: "d", p_vertical: 4}
-    refute  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 1)
+    assert   Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "h", 1) == @mov_invalido
   end
 
   test "movimiento valido rey" do
@@ -159,12 +161,12 @@ defmodule PiezaControlTest do
 
   test "movimiento invalido rey" do
     pieza = %Pieza{nombre: :rey, p_horizontal: "d", p_vertical: 4}
-    refute  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 2)
+    assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 2) == @mov_invalido
   end
 
   test "movimiento invalido rey 2" do
     pieza = %Pieza{nombre: :rey, p_horizontal: "d", p_vertical: 4}
-    refute  Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 6)
+    assert Ajedrez.PiezaControl.movimiento_pieza_valido(pieza, "d", 6) == @mov_invalido
   end
 
 end

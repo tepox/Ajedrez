@@ -74,7 +74,7 @@ require Logger
     |> TableroControl.pieza_tablero("e", 2)
     |> Help.get_movimiento(jugador1, jugador2, "h", 3)
     |> TableroControl.moviento(tablero)
-    assert error == {:error, "no es posible el movimiento"}
+    assert error == {:error, "movimiento invalido"}
   end
 
   test "movimiento valido torre", %{jugadores: {jugador1, jugador2}} do
@@ -110,7 +110,7 @@ require Logger
     |> TableroControl.pieza_tablero("e", 2)
     |> Help.get_movimiento(jugador1, jugador2, "c", 4)
     |> TableroControl.moviento(tablero)
-    assert error == {:error, "no es posible el movimiento"}
+    assert error == {:error, "movimiento invalido"}
   end
 
   test "movimiento valido alfil", %{jugadores: {jugador1, jugador2}} do
@@ -146,7 +146,7 @@ require Logger
     |> TableroControl.pieza_tablero("e", 2)
     |> Help.get_movimiento(jugador1, jugador2, "a", 2)
     |> TableroControl.moviento(tablero)
-    assert error == {:error, "no es posible el movimiento"}
+    assert error == {:error, "movimiento invalido"}
   end
 
   test "movimiento valido caballo", %{jugadores: {jugador1, jugador2}} do
@@ -182,7 +182,7 @@ require Logger
     |> TableroControl.pieza_tablero("e", 2)
     |> Help.get_movimiento(jugador1, jugador2, "e", 4)
     |> TableroControl.moviento(tablero)
-    assert error == {:error, "no es posible el movimiento"}
+    assert error == {:error, "movimiento invalido"}
   end
 
   test "movimiento valido dama 1", %{jugadores: {jugador1, jugador2}} do
@@ -230,7 +230,7 @@ require Logger
     |> TableroControl.pieza_tablero("e", 2)
     |> Help.get_movimiento(jugador1, jugador2, "h", 6)
     |> TableroControl.moviento(tablero)
-    assert error == {:error, "no es posible el movimiento"}
+    assert error == {:error, "movimiento invalido"}
   end
 
   test "movimiento valido rey 1", %{jugadores: {jugador1, jugador2}} do
