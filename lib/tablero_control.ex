@@ -178,7 +178,6 @@ defp movimiento_valido(
        ) do
 
         with {:ok, _} <- PiezaC.movimiento_pieza_valido(caballo, n_h, n_v),
-             {:ok, _} <- espacio_valido(tablero_actual, n_h, n_v),
              {:ok, _} <- captura_o_espacio_valido(caballo, tablero_actual, n_h, n_v)
         do
           {:ok, "moivimiento correcto"}
@@ -318,6 +317,7 @@ defp movimiento_valido(
       |> actualiza_pieza_tablero(pieza)
       |> actualiza_pieza_tablero(torre_a)
       |> actualiza_pieza_nil_tablero(torre.p_horizontal, torre.p_vertical)
+      |> actualiza_pieza_nil_tablero(v_h, v_v)
     else
       pieza = actualiza_pieza(pieza, n_h, n_v)
 
@@ -403,7 +403,7 @@ defp enroque_libre_evalua_posicion({h, v}, cc) do
     if pieza == nil, do: {:ok, "espacio valido"}, else: {:error, "espacio invalido"}
   end
 
-  defp captura_o_espacio_valido(pieza, tablero, n_h, n_v) do
+    defp captura_o_espacio_valido(pieza, tablero, n_h, n_v) do
     case {espacio_valido(tablero, n_h, n_v),
           captura_valida(pieza, tablero, n_h,
           n_v)} do
