@@ -6,39 +6,41 @@ defmodule AjedrezControl do
   require Logger
 
   def inicia do
-    
+
     jugador1 = %Jugador{nombre: "jugador 1", color: :blancas}
-    jugador2 = %Jugador{nombre: "jugador 2", color: :negras}    
+    jugador2 = %Jugador{nombre: "jugador 2", color: :negras}
     ajedrez = TableroControl.inicia_juego(%Tablero{}, jugador1, jugador2)
     imprime_tablero(ajedrez.tablero)
-    juego(ajedrez, ajedrez.jugador1, ajedrez.jugador2)
+    juego(ajedrez, :blancas)
   end
 
-  defp juego(%Ajedrez{tablero: tablero}, jugador_movimiento, jugador_espera) do
-    movimiento_jugador = IO.gets("movimiento #{jugador_movimiento.color}:\n")
+  defp juego(ajedrez = %Ajedrez{tablero: tablero}, color) do
+    movimiento_jugador = IO.gets("movimiento #{color}:\n")
 
     if valida_movimiento(movimiento_jugador) do
       case TableroControl.moviento(
-             genera_movimiento(movimiento_jugador, jugador_movimiento, jugador_espera, tablero),
+             genera_movimiento(movimiento_jugador, get_jugador(ajedrez, color), get_jugador(ajedrez, color_siguiente(color)), tablero),
              tablero
            ) do
-        {:ok, ajedrez} ->
-          imprime_jugador(ajedrez.jugador1)
-          imprime_jugador(ajedrez.jugador2)
-          imprime_tablero(ajedrez.tablero)
-          if TableroControl.en_jaque_mate?(tablero, jugador2, jugador1) do
-            IO.puts("gana jugador #{jugador1.nombre}")
+        {:ok, ajedrez_a} ->
+          imprime_jugador(ajedrez_a.jugador1)
+          imprime_jugador(ajedrez_a.jugador2)
+          imprime_tablero(ajedrez_a.tablero)
+          jugador_movimiento = get_jugador(ajedrez_a, color)
+          jugador_espera  = get_jugador(ajedrez_a, color_siguiente(color))
+          if TableroControl.en_jaque_mate?(tablero, jugador_espera, jugador_movimiento) do
+            IO.puts("gana jugador #{jugador_movimiento.nombre}")
           else
-            juego(ajedrez, ajedrez.jugador2, ajedrez.jugador1)
+            juego(ajedrez, color_siguiente(color))
           end
 
         {:error, mensaje} ->
           IO.puts("#{mensaje}")
-          juego(tablero, jugador_movimiento, jugador_espera)
+          juego(tablero, color)
       end
     else
       IO.puts("movimiento mal declarado")
-      juego(tablero, jugador_movimiento, jugador_espera)
+      juego(tablero, color)
     end
   end
 
@@ -50,7 +52,6 @@ defmodule AjedrezControl do
   defp genera_movimiento(movimiento, jugador1, jugador2, tablero) do
     [v_h, v_v, _, n_h, n_v, _] = String.graphemes(movimiento)
     pieza = TableroControl.pieza_tablero(tablero, v_h, String.to_integer(v_v))
-    IO.puts(inspect(pieza))
     %Movimiento{
       jugador1: jugador1,
       jugador2: jugador2,
@@ -88,6 +89,23 @@ defmodule AjedrezControl do
         pieza -> IO.write(String.pad_leading("#{pieza.nombre}", 8, [" "]))
       end
     end)
+  end
+
+  defp get_jugador(%Ajedrez{jugador1: jugador1 = %Jugador{color: b} }, b) do
+    jugador1
+  end
+
+
+  defp get_jugador(%Ajedrez{jugador2: jugador2 = %Jugador{color: b}}, b) do
+    jugador2
+  end
+
+  defp color_siguiente(:blancas) do
+    :negras
+  end
+
+  defp color_siguiente(:negras) do
+    :blancas
   end
 
 end

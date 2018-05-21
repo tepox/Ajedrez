@@ -20,17 +20,38 @@ defmodule TableroControl do
 
   @tablero_horizontal ["a", "b", "c", "d", "e", "f", "g", "h"]
 
-  def moviento(movimiento, tablero_actual) do
+  def moviento(movimiento, ajedrez) do
     with {:ok, _} <- pieza_correcta(movimiento),
-         {:ok, _} <- movimiento_valido(movimiento, tablero_actual),
-         {:ok, _} <- rey_no_jaque(movimiento, tablero_actual)
+         {:ok, _} <- movimiento_valido(movimiento, ajedrez.tablero),
+         {:ok, _} <- rey_no_jaque(movimiento, ajedrez.tablero)
     do
-      {:ok, actualiza_jugador_movimiento(movimiento, tablero_actual),
-           actualiza_jugador_espera(movimiento, tablero_actual),
-           actualiza_tablero(movimiento, tablero_actual)}
+      jugador_m = actualiza_jugador_movimiento(movimiento, ajedrez.tablero)
+      jugador_e = actualiza_jugador_espera(movimiento, ajedrez.tablero)
+      tablero =  actualiza_tablero(movimiento, ajedrez.tablero)
+
+      {:ok, ajedrez
+        |> ajedrez_actualizar_jugador_movimiento(jugador_m)
+        |> ajedrez_actualizar_jugador_espera(jugador_e)
+        |> Map.put(:tablero, tablero)}
     else
       error -> error
     end
+  end
+
+  defp ajedrez_actualizar_jugador_movimiento(ajedrez = %Ajedrez{jugador1: %Jugador{color: color}}, jugador_m = %Jugador{color: color})do
+    Map.put(ajedrez, :jugador1, jugador_m)
+  end
+
+  defp ajedrez_actualizar_jugador_movimiento(ajedrez = %Ajedrez{jugador2: %Jugador{color: color}}, jugador_m = %Jugador{color: color})do
+    Map.put(ajedrez, :jugador2, jugador_m)
+  end
+
+  defp ajedrez_actualizar_jugador_espera(ajedrez = %Ajedrez{jugador1: %Jugador{color: color}}, jugador_e = %Jugador{color: color})do
+    Map.put(ajedrez, :jugador1, jugador_e)
+  end
+
+  defp ajedrez_actualizar_jugador_espera(ajedrez = %Ajedrez{jugador2: %Jugador{color: color}}, jugador_e = %Jugador{color: color})do
+    Map.put(ajedrez, :jugador2, jugador_e)
   end
 
   defp pieza_correcta(movimiento) do
@@ -388,10 +409,10 @@ defp enroque_libre_evalua_posicion({h, v}, cc) do
         p_horizontal: h,
         p_vertical: v
       }
-      case moviento(mov, t_a) do
+      case moviento(mov, %Ajedrez{tablero: t_a, jugador1: j1, jugador2: j2}) do
           {:error, _error} ->
             {:error, "rey queda en jaque"}
-          {:ok, j1, j2, t_an} ->
+          {:ok, %Ajedrez{tablero: t_an, jugador1: j1, jugador2: j2}} ->
             {t_an, j1, j2}
         end
       error -> error
