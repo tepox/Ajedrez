@@ -565,12 +565,12 @@ defp enroque_libre_evalua_posicion({h, v}, cc) do
       JugadorC.jugador_agrega_pieza_short(jugador2, @pos_inicial_jugador2)
 
     tablero = actualiza_pieza_tablero(tablero, jugador1.piezas ++ jugador2.piezas)
-    {tablero, jugador1, jugador2}
+    %Ajedrez{jugador1: jugador1, jugador2: jugador2, tablero: tablero}
   end
 
   def inicia_juego(tablero, jugador1, jugador2) do
     tablero = actualiza_pieza_tablero(tablero, jugador1.piezas ++ jugador2.piezas)
-    {tablero, jugador1, jugador2}
+    %Ajedrez{jugador1: jugador1, jugador2: jugador2, tablero: tablero}
   end
 
 
