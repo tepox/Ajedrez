@@ -32,10 +32,16 @@ defmodule TableroControl do
       {:ok, ajedrez
         |> ajedrez_actualizar_jugador_movimiento(jugador_m)
         |> ajedrez_actualizar_jugador_espera(jugador_e)
-        |> Map.put(:tablero, tablero)}
+        |> ajedrez_actualiza_historial(movimiento)
+        |> Map.put(:tablero, tablero)
+      }
     else
       error -> error
     end
+  end
+
+  defp ajedrez_actualiza_historial(ajedrez,movimiento)do
+
   end
 
   defp ajedrez_actualizar_jugador_movimiento(ajedrez = %Ajedrez{jugador1: %Jugador{color: color}}, jugador_m = %Jugador{color: color})do
